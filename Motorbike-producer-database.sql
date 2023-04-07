@@ -1,5 +1,6 @@
 /*  Motorbike producer database
-A company has various business intelligence dashboards to track and analyze its operations and performance across different areas of its business. We will consider here the following dashboards: Sales Dashboard, Production Dashboard, Marketing Dashboard, Customer Service Dashboard. 
+A company has various business intelligence dashboards to track and analyze its operations and performance across different areas of its business. 
+We will consider here the following dashboards: Sales Dashboard, Production Dashboard, Marketing Dashboard, Customer Service Dashboard. 
 Created by: PostgreSQL (if you use Oracle SQL you can change datatype Integer to Number and Varchar to Varchar2 to obrain the same results)
 */ 
   
