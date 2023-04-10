@@ -23,7 +23,6 @@ Created by: PostgreSQL (if you use Oracle SQL you can change datatype Integer to
    emp_id         INT,
   constraint pk_sales_dashboard primary key (VIN));
 
-  select * from sales;
  
 insert into sales_dashboard values
 (1,'Cafe_Racer_Motorradumbau','C_series',1,8900,'United_States','2016-01-01','2022-10-10', 1000,'2023-02-03',500,'leasing',4000,10);
@@ -34,70 +33,6 @@ insert into sales values
 (4,'BMW_Enduro_SE_Concept','C_series',1,21850,'Italy','07-05-2022','10-10-2022', 1000,'01-04-2028',503,'direct_sale',15000,40);
 insert into sales values
 (5,'Motorradwippe','F_series',2,12000,'Italy','05-16-2020','10-10-2022',1000,'08-23-2024',504,'credit',3000,50);
-
-
-/* 1. How much Sales? */
-select sum(price_unit) as total_sales from sales;
-select sum(production_costs) as costs from salesd;
-
-/* 2. How many vehicles were sold? */
-select count(no_units_sold) as items_sold from sales;
-
-/* 3. The average price of a vehicle*/
-select avg(price_unit) as average_motorrad_price from sales;
-
-/* 4. How many motorbikes were sold in leasing and how many in credit?*/
-select * from sales_dashboard where type_of_contract in ('leasing','credit') order by VIN;
-
-/* 5. What is our profit?*/
-select sum(price_unit) - sum(production_costs) as total_profit from sales;
-
-/* 6. Sales growth */
-select extract(year from order_date) as year, sum(price_unit) as total_sales from sales group by year order by year;
-select extract(year from order_date) as year, sum(price_unit) as total_sales from sales group by year order by year; 
-select year1.year as year1,
-	   year1.sales as sales1,
-	   year2.year as year2,
-	   year2.sales as sales2,
-	   year2.sales - year1.sales as sales_diff
-	   from (select date_part('year', order_date) as year, sum(price_unit) as sales
-	   from sales
-	   where date_part('year', order_date) = 2020
-	   group by date_part('year', order_date)) year1
-	   join (select date_part('year', order_date) as year, sum(price_unit) as sales
-	   from sales
-	   where date_part('year', order_date) = 2022
-	   group by date_part('year', order_date)) year2
-	   on
-	   year1.year < year2.year;
-
-/*7. Min Sales */
-select min(price_unit) from sales limit 1;
-
-/*8. Max Sales */
-select max(price_unit) from sales limit 1;
-
-/*9. Employee who brought most sales */
-select emp_id,sum(price_unit) from sales order by sum(price_unit) DESC;
-
-/*10. All employee who sold 1 vehicle */
-select year(sale_date) as year from sales;
-
-/*11. Total cost of ordered vehicles from Jan 2020 till Jan 2022 for a dewaler Woodlands*/
-select sum(additional_costs) as total_costs from sales;
-select sum(additional_costs) as total_costs from sales where order_date between '01-01-2020' and '01-01-2022';
-select dealers.dealer_name,sum(sales.price_unit) as total_costs from dealers as dealers left join sales as sales on dealers.dealer_id=sales.dealer_id where dealers.dealer_id = 504 and order_date between '01-01-2020' and '01-01-2022' group by dealers.dealer_name;
-
-
-/*12. Total sales by country (2 ways)*/
-/*12.1 Partition by - by columns*/
-select sale_date, country, price_unit, sum(price_unit) over(partition by country) as total_sales from sales order by country, sale_date; 
-/*12.2 Subquery in Select - by countries*/
-select sale_date, country,(select sum(price_unit) from sales where country = main.country) from sales as main group by country;
-
-/*13. Percent of sales by country */
-select sale_date, country, price_unit, 100.0 * price_unit / sum(price_unit) over (partition by country) as percent_of_sales from sales order by country, sale_date; 
-
 
 /*TABLE INVENTORY*/ 
 
@@ -130,11 +65,6 @@ create table inventory (
        alter table inventory      
       add constraint fk_sales foreign key (VIN) 
       references inventory (vehicle_name) on delete set null;
-      
-/*1. Inventory level */
-select sum(no_of_units) from inventory;
-
-select * from dealers;
    
 /*TABLE DEALERS*/ 
 create table dealers (  
@@ -160,14 +90,6 @@ insert into dealers values
 insert into dealers values
 (504,'Woodlands',22313,5,'Italy');
 
-/*Dealers located in the Italy*/
-select * from sales_dashboard where country like '%Italy%';
-
-/*How many countries are in the table? */
-select count(distinct country) as quantity_countries from dealers;
-
-select * from employees;
-
 /*TABLE EMPLOYEES*/ 
 create table employees (  
   emp_id            INT,  
@@ -191,13 +113,3 @@ insert into EMPLOYEES values
 (24,'Matt','Osborne', 150000,5);
 insert into EMPLOYEES values
 (25,'Fernanda','James',70000,2);
-
-/*An employee brought the most sales */
-select employees.first_name,sum(sales.price_unit) as total_sales
-from employees
-join sales on employees.vin = sales.vin
-group by employees.first_name
-order by total_sales DESC
-limit 1;
-
- 
